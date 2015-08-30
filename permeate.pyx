@@ -194,7 +194,7 @@ def dogbone(double V, double A, double K, double c_in,
     """
     # Counter variables used for timestepping, indexing positions,
     # and trapezoidal integration
-    if times_to_save == None:
+    if times_to_save is None:
         times_to_save = np.arange(maxt,-outputperiod/2.,-outputperiod).tolist()
     else:
         times_to_save=times_to_save[::-1]
