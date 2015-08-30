@@ -195,11 +195,15 @@ def dogbone(double V, double A, double K, double c_in,
     # Counter variables used for timestepping, indexing positions,
     # and trapezoidal integration
     if times_to_save == None:
-        times_to_save = np.arange(maxt,0.,-outputperiod).tolist()
+        times_to_save = np.arange(maxt,-outputperiod/2.,-outputperiod).tolist()
     else:
+        times_to_save=times_to_save[::-1]
+        try:
+            times_to_save = times_to_save.tolist()
+        except:
+            pass
         maxt = max(times_to_save)
     cdef:
-        int step = 0
         int i = 0
         int savingdata = 0
         int save_i = 0
@@ -242,25 +246,13 @@ def dogbone(double V, double A, double K, double c_in,
         for i in range(num_elements):
             c_old[i] = c[i]
 
-        # Initial save (Should be exact copy of save code below!)
-        for i in range(num_elements-2):
-            tally += c[i+1]
-        tally += c[0]/2.
-        tally += c[num_elements-1]/2.
-        uptake[save_i] = tally/num_elements*L
-        c_in_traj[save_i] = c_in
-        times[save_i] = time
-        if (save_profile):
-            for i in range(num_elements):
-                c_profile[save_i*num_elements + i] = c[i]
-        save_i += 1
         savingdata = 0
 
         # Inner loop with static types
         while time < maxt and save_i < num_saves:
             # Forward Euler integration of diffusion equation
             dt = abs(double_min(max_dt,0.1/depl_factor*c_in/(c_old[0]-c_old[1])))
-            if dt > (next_save_time - time):
+            if dt >= (next_save_time - time):
                 dt = next_save_time - time
                 try:
                     next_save_time = times_to_save.pop()
@@ -294,7 +286,6 @@ def dogbone(double V, double A, double K, double c_in,
                 times[save_i] = time
                 save_i += 1
                 savingdata = 0
-            step += 1
 
         if save_profile:
             return [ times[i] for i in range(num_saves) ],  \
