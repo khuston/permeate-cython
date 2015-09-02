@@ -27,6 +27,8 @@ for t in times:
     analytic_c = analytic.evaluate(x,t)
     analytic_uptake.append(np.trapz(analytic_c,x))
 
-plt.plot(times,analytic_uptake,'-')
+print A*np.array(analytic_uptake)
+print numeric_uptake
+plt.plot(times,A*np.array(analytic_uptake),'-')
 plt.plot(times,np.array(numeric_uptake),'.')
 plt.show()

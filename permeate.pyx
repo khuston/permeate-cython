@@ -281,7 +281,7 @@ def dogbone(double V, double A, double K, double c_in,
                     for i in range(num_elements):
                         c_profile[save_i*num_elements + i] = c[i]
 
-                uptake[save_i] = tally/num_elements*L
+                uptake[save_i] = tally/num_elements*L*A
                 c_in_traj[save_i] = c_in
                 times[save_i] = time
                 save_i += 1
@@ -386,7 +386,7 @@ def crystal_dogbone(double V, double A, double K, double c_in,
 
     # Pre-calculate some coefficients
     cdef:
-        double max_dt = 0.4 * L**2/(D * num_elements**2)
+        double max_dt = 0.4 * L**2/(D*phi**(nu-1.) * num_elements**2)
         double dt = max_dt
         double diff_factor = num_elements**2 * D/L**2 * phi**(nu-1.)
         double depl_factor = (phi**nu*A*D*num_elements)/(V*L)
@@ -422,7 +422,7 @@ def crystal_dogbone(double V, double A, double K, double c_in,
         savingdata = 0
 
         # Inner loop with static types
-        while time < maxt and save_i < num_saves:
+        while time < maxt or save_i < num_saves:
             # Forward Euler integration of diffusion equation
             dt = abs(double_min(max_dt,0.1/depl_factor*c_in/(c_old[0]-c_old[1])))
             if dt >= (next_save_time - time):
@@ -454,7 +454,7 @@ def crystal_dogbone(double V, double A, double K, double c_in,
                     for i in range(num_elements):
                         c_profile[save_i*num_elements + i] = c[i]
 
-                uptake[save_i] = tally/num_elements*L
+                uptake[save_i] = tally/num_elements*L*A*phi
                 c_in_traj[save_i] = c_in
                 times[save_i] = time
                 save_i += 1
